@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./node_modules/bulma/css/bulma.min.css">
+    <title>callee</title>
+    <style>
+        html, body{
+            height: 100%;
+        }
+        textarea {
+            width: 100%;
+            height: 100%;
+        }
+        body > .columns{
+            height: 100%;
+        }
+        body > .columns > .column > .columns{
+            height: 50%;
+        }
+        #local-video {
+            width: 320px;
+            height: 240px;
+        }
+
+        #remote-video {
+            width: 320px;
+            height: 240px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="columns">
+        <div class="column">
+            <div class="columns">
+                <div class="column">
+                    <video id="local-video" autoplay muted></video>
+                </div>
+                <div class="column">
+                    <video id="remote-video" autoplay></video>
+                </div>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <label for="offer-sdp">2. Offer SDP</label><button id="receive-offer-button">Receive Offer</button>
+                    <textarea id="offer-sdp"></textarea>
+                </div>
+                <div class="column">
+                    <label for="answer-sdp">3. Answer SDP</label>
+                    <textarea id="answer-sdp"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <textarea id="log-console"></textarea>
+        </div>
+    </div>
+
+    <script src="./src/callee.js" defer></script>
+</body>
+
+</html>
