@@ -33,7 +33,13 @@ bower_components
 build/Release
 
 # Dependency directories
-node_modules/
+node_modules/*
+node_modules/bulma/*
+node_modules/bulma/css/*
+!node_modules/
+!node_modules/bulma
+!node_modules/bulma/css
+!node_modules/bulma/css/bulma.min.css
 jspm_packages/
 
 # TypeScript v1 declaration files

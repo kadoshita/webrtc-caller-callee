@@ -1,4 +1,3 @@
-const localVideoElem = document.getElementById('local-video');
 const remoteVideoElem = document.getElementById('remote-video');
 
 const logConsole = document.getElementById('log-console');
@@ -8,6 +7,7 @@ const answerSdpElem = document.getElementById('answer-sdp');
 const receiveOfferButton = document.getElementById('receive-offer-button');
 
 let pc = null;
+let remoteStream = null;
 
 const zero_padding = (num, digit) => {
     return num.toString().padStart(digit, '0');
@@ -31,7 +31,7 @@ const logger = (log, type = 'log') => {
     const prevValue = logConsole.value;
     logConsole.value = `[${type.toUpperCase()}] ${date.toLocaleTimeString()}.${zero_padding(date.getMilliseconds(), 3)}: ${log}\n` + prevValue;
 };
-const createPeerConnection = localStream => {
+const createPeerConnection = () => {
     logger(`createPeerConnection`);
     const _pc = new RTCPeerConnection({
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
@@ -61,15 +61,16 @@ const createPeerConnection = localStream => {
     };
     _pc.ontrack = evt => {
         logger(`ontrack`);
+        remoteStream = evt.streams[0];
         remoteVideoElem.srcObject = evt.streams[0];
+        _pc.addStream(remoteStream);
     };
-    _pc.addStream(localStream);
 
     return _pc;
 };
-const onReceiveOffer = localStream => {
+const onReceiveOffer = () => {
     logger(`onReceiveOffer`);
-    pc = createPeerConnection(localStream);
+    pc = createPeerConnection();
     const offerSdp = offerSdpElem.value;
     pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: offerSdp }))
         .then(() => {
@@ -91,11 +92,8 @@ const onReceiveOffer = localStream => {
 };
 (async () => {
     logger('start');
-    let localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-    localVideoElem.srcObject = localStream;
-    logger('set stream');
 
     receiveOfferButton.addEventListener('click', () => {
-        onReceiveOffer(localStream);
+        onReceiveOffer();
     });
 })();
