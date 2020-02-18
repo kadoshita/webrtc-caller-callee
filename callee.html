@@ -8,18 +8,34 @@
     <link rel="stylesheet" href="./node_modules/bulma/css/bulma.min.css">
     <title>callee</title>
     <style>
-        html, body{
+        html,
+        body {
             height: 100%;
         }
+
         textarea {
             width: 100%;
             height: 100%;
         }
-        body > .columns{
-            height: 100%;
+
+        body>.column {
+            height: 10%;
         }
-        body > .columns > .column > .columns{
+
+        body>.columns {
+            height: 90%;
+        }
+
+        body>.columns>.column>.columns {
             height: 50%;
+        }
+
+        #stun-server-url {
+            width: 15%;
+        }
+
+        #turn-server-url {
+            width: 15%;
         }
 
         #remote-video {
@@ -30,6 +46,13 @@
 </head>
 
 <body>
+    <div class="column">
+        <label>STUN Server:<input id="stun-server-url" type="text" /></label>
+        <label>TURN Server:<input id="turn-server-url" type="text" /></label>
+        <label>TURN User:<input id="turn-server-user" type="text" /></label>
+        <label>TURN Pass:<input id="turn-server-pass" type="text" /></label>
+        <label><input id="force-use-for-turn" type="checkbox" />:Force use of TURN</label>
+    </div>
     <div class="columns">
         <div class="column">
             <div class="columns">

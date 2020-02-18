@@ -1,3 +1,9 @@
+const stunServerUrlElem = document.getElementById('stun-server-url');
+const turnServerUrlElem = document.getElementById('turn-server-url');
+const turnServerUserElem = document.getElementById('turn-server-user');
+const turnServerPassElem = document.getElementById('turn-server-pass');
+const forceUseForTurnElem = document.getElementById('force-use-for-turn');
+
 const remoteVideoElem = document.getElementById('remote-video');
 
 const logConsole = document.getElementById('log-console');
@@ -33,9 +39,29 @@ const logger = (log, type = 'log') => {
 };
 const createPeerConnection = () => {
     logger(`createPeerConnection`);
+    const turnServerConfig = {
+        urls: turnServerUrlElem.value,
+        username: turnServerUserElem.value,
+        credential: turnServerPassElem.value
+    };
+    const iceServers = [
+        { urls: (stunServerUrlElem.value === '') ? 'stun:stun.l.google.com:19302' : stunServerUrlElem.value }
+    ]
+    if (turnServerConfig.urls !== '' && turnServerConfig.username !== '' && turnServerConfig.credential !== '') {
+        iceServers.push(turnServerConfig);
+    }
+
     const _pc = new RTCPeerConnection({
-        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        iceServers,
+        iceTransportPolicy: forceUseForTurnElem.checked ? 'relay' : 'all'
     });
+
+    localStorage.setItem('stunServerUrl', stunServerUrlElem.value);
+    localStorage.setItem('turnServerUrl', turnServerUrlElem.value);
+    localStorage.setItem('turnServerUser', turnServerUserElem.value);
+    localStorage.setItem('turnServerPass', turnServerPassElem.value);
+    localStorage.setItem('forceUseForTurn', forceUseForTurnElem.checked);
+
     _pc.onconnectionstatechange = evt => {
         logger(`onconnectionstatechange->${_pc.connectionState}`);
     };
@@ -92,7 +118,11 @@ const onReceiveOffer = () => {
 };
 (async () => {
     logger('start');
-
+    stunServerUrlElem.value = localStorage.getItem('stunServerUrl');
+    turnServerUrlElem.value = localStorage.getItem('turnServerUrl');
+    turnServerUserElem.value = localStorage.getItem('turnServerUser');
+    turnServerPassElem.value = localStorage.getItem('turnServerPass');
+    forceUseForTurnElem.checked = (localStorage.getItem('forceUseForTurn') === 'true');
     receiveOfferButton.addEventListener('click', () => {
         onReceiveOffer();
     });
