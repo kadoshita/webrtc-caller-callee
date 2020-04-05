@@ -14,6 +14,7 @@ const receiveOfferButton = document.getElementById('receive-offer-button');
 
 let pc = null;
 let remoteStream = null;
+let iceServers = null;
 
 const zero_padding = (num, digit) => {
     return num.toString().padStart(digit, '0');
@@ -39,17 +40,17 @@ const logger = (log, type = 'log') => {
 };
 const createPeerConnection = () => {
     logger(`createPeerConnection`);
-    const turnServerConfig = {
-        urls: turnServerUrlElem.value,
-        username: turnServerUserElem.value,
-        credential: turnServerPassElem.value
-    };
-    const iceServers = [
-        { urls: (stunServerUrlElem.value === '') ? 'stun:stun.l.google.com:19302' : stunServerUrlElem.value }
-    ]
-    if (turnServerConfig.urls !== '' && turnServerConfig.username !== '' && turnServerConfig.credential !== '') {
-        iceServers.push(turnServerConfig);
-    }
+    // const turnServerConfig = {
+    //     urls: turnServerUrlElem.value,
+    //     username: turnServerUserElem.value,
+    //     credential: turnServerPassElem.value
+    // };
+    // const iceServers = [
+    //     { urls: (stunServerUrlElem.value === '') ? 'stun:stun.l.google.com:19302' : stunServerUrlElem.value }
+    // ]
+    // if (turnServerConfig.urls !== '' && turnServerConfig.username !== '' && turnServerConfig.credential !== '') {
+    //     iceServers.push(turnServerConfig);
+    // }
 
     const _pc = new RTCPeerConnection({
         iceServers,
@@ -116,6 +117,11 @@ const onReceiveOffer = () => {
             logger(`set Offer SDP->${err.message}`, 'error');
         });
 };
+const onReceiveCandidate = sdp => {
+    const candidate = new RTCIceCandidate(sdp);
+    pc.addIceCandidate(candidate);
+};
+
 (async () => {
     logger('start');
     stunServerUrlElem.value = localStorage.getItem('stunServerUrl');
@@ -126,4 +132,47 @@ const onReceiveOffer = () => {
     receiveOfferButton.addEventListener('click', () => {
         onReceiveOffer();
     });
+
+    const signalingUrl = 'wss://ayame-lite.shiguredo.jp/signaling';
+    const options = {
+        video: {
+            direction: 'sendrecv', enable: true
+        },
+        clientId: 'clientId'
+    };
+    const ws = new WebSocket(signalingUrl);
+    ws.onclose = () => {
+        console.log('close');
+    };
+    ws.onerror = () => {
+        console.error('ws error');
+    };
+
+    ws.onopen = () => {
+        console.log('open');
+        const registerMessage = {
+            type: 'register',
+            roomId: roomId,
+            clientId: options.clientId,
+            authnMetadata: undefined,
+            key: signalingKey
+        };
+        ws.send(JSON.stringify(registerMessage));
+        if (ws) {
+            ws.onmessage = async evt => {
+                const recvData = JSON.parse(evt.data);
+                console.log(recvData);
+                if (recvData.type === 'ping') {
+                    ws.send(JSON.stringify({ type: 'pong' }));
+                } else if (recvData.type === 'accept') {
+                    iceServers = recvData.iceServers;
+                } else if (recvData.type === 'offer') {
+                    offerSdpElem.value = recvData.sdp;
+                    onReceiveOffer();
+                } else if (recvData.type === 'candidate') {
+                    onReceiveCandidate(recvData.ice);
+                }
+            };
+        }
+    }
 })();

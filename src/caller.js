@@ -176,7 +176,8 @@ const onReceiveCandidate = sdp => {
                 } else if (recvData.type === 'accept') {
                     onCreateOffer(localStream, recvData.iceServers);
                 } else if (recvData.type === 'answer') {
-                    answerSdpElem.value = recvData.sdp
+                    answerSdpElem.value = recvData.sdp;
+                    onReceiveAnswer();
                 } else if (recvData.type === 'candidate') {
                     onReceiveCandidate(recvData.ice);
                 }
