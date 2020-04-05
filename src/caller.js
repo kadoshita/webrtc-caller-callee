@@ -148,7 +148,7 @@ const onReceiveAnswer = () => {
         console.log(pc.remoteDescription);
     });
 
-    const signalingUrl = '';
+    const signalingUrl = 'wss://ayame-lite.shiguredo.jp/signaling';
     const roomId = '';
     const options = {
         video: {
@@ -156,4 +156,14 @@ const onReceiveAnswer = () => {
             clientId: 'clientId'
         }
     };
+    const ws = new WebSocket(signalingUrl);
+    ws.onclose = () => {
+        console.log('close');
+    };
+    ws.onerror = () => {
+        console.error('ws error');
+    };
+    ws.onopen = () => {
+        console.log('open');
+    }
 })();
