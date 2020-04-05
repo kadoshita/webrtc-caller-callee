@@ -173,5 +173,14 @@ const onReceiveAnswer = () => {
             key: signalingKey
         };
         ws.send(JSON.stringify(registerMessage));
+        if (ws) {
+            ws.onmessage = async evt => {
+                const recvData = JSON.parse(evt.data);
+                console.log(recvData);
+                if (recvData.type === 'ping') {
+                    ws.send(JSON.stringify({ type: 'pong' }));
+                }
+            };
+        }
     }
 })();
