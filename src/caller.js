@@ -114,6 +114,11 @@ const onReceiveAnswer = () => {
             logger(`setAnswerSDP->${err.message}`, 'error');
         });
 };
+const onReceiveCandidate = sdp => {
+    const candidate = new RTCIceCandidate(sdp);
+    pc.addIceCandidate(candidate);
+};
+
 (async () => {
     logger('start');
     stunServerUrlElem.value = localStorage.getItem('stunServerUrl');
@@ -172,6 +177,8 @@ const onReceiveAnswer = () => {
                     onCreateOffer(localStream, recvData.iceServers);
                 } else if (recvData.type === 'answer') {
                     answerSdpElem.value = recvData.sdp
+                } else if (recvData.type === 'candidate') {
+                    onReceiveCandidate(recvData.ice);
                 }
             };
         }
