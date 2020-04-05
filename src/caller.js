@@ -170,6 +170,8 @@ const onReceiveAnswer = () => {
                     ws.send(JSON.stringify({ type: 'pong' }));
                 } else if (recvData.type === 'accept') {
                     onCreateOffer(localStream, recvData.iceServers);
+                } else if (recvData.type === 'answer') {
+                    answerSdpElem.value = recvData.sdp
                 }
             };
         }
