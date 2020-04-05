@@ -147,4 +147,13 @@ const onReceiveAnswer = () => {
     getRemoteSDPButton.addEventListener('click', () => {
         console.log(pc.remoteDescription);
     });
+
+    const signalingUrl = '';
+    const roomId = '';
+    const options = {
+        video: {
+            direction: 'sendrecv', enable: true,
+            clientId: 'clientId'
+        }
+    };
 })();
