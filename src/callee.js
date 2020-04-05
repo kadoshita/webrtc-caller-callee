@@ -12,6 +12,7 @@ const offerSdpElem = document.getElementById('offer-sdp');
 const answerSdpElem = document.getElementById('answer-sdp');
 const receiveOfferButton = document.getElementById('receive-offer-button');
 
+let ws = null;
 let pc = null;
 let remoteStream = null;
 let iceServers = null;
@@ -72,6 +73,7 @@ const createPeerConnection = () => {
             answerSdpElem.value = _pc.localDescription.sdp;
             answerSdpElem.focus();
             answerSdpElem.select();
+            ws.send(JSON.stringify(pc.localDescription));
         }
     };
     _pc.oniceconnectionstatechange = evt => {
@@ -133,14 +135,13 @@ const onReceiveCandidate = sdp => {
         onReceiveOffer();
     });
 
-    const signalingUrl = 'wss://ayame-lite.shiguredo.jp/signaling';
     const options = {
         video: {
             direction: 'sendrecv', enable: true
         },
         clientId: 'clientId'
     };
-    const ws = new WebSocket(signalingUrl);
+    ws = new WebSocket(signalingUrl);
     ws.onclose = () => {
         console.log('close');
     };

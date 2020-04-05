@@ -18,6 +18,7 @@ const getLocalSDPButton = document.getElementById('get-local-sdp');
 const getRemoteSDPButton = document.getElementById('get-remote-sdp');
 
 let pc = null;
+let ws = null;
 
 const zero_padding = (num, digit) => {
     return num.toString().padStart(digit, '0');
@@ -63,6 +64,7 @@ const createPeerConnection = (localStream, iceServers) => {
             offerSdpElem.value = _pc.localDescription.sdp;
             offerSdpElem.focus();
             offerSdpElem.select();
+            ws.send(JSON.stringify(pc.localDescription));
         }
     };
     _pc.oniceconnectionstatechange = evt => {
@@ -142,14 +144,13 @@ const onReceiveCandidate = sdp => {
         console.log(pc.remoteDescription);
     });
 
-    const signalingUrl = 'wss://ayame-lite.shiguredo.jp/signaling';
     const options = {
         video: {
             direction: 'sendrecv', enable: true
         },
         clientId: 'clientId'
     };
-    const ws = new WebSocket(signalingUrl);
+    ws = new WebSocket(signalingUrl);
     ws.onclose = () => {
         console.log('close');
     };
