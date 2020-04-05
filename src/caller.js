@@ -149,12 +149,11 @@ const onReceiveAnswer = () => {
     });
 
     const signalingUrl = 'wss://ayame-lite.shiguredo.jp/signaling';
-    const roomId = '';
     const options = {
         video: {
-            direction: 'sendrecv', enable: true,
-            clientId: 'clientId'
-        }
+            direction: 'sendrecv', enable: true
+        },
+        clientId: 'clientId'
     };
     const ws = new WebSocket(signalingUrl);
     ws.onclose = () => {
@@ -163,7 +162,16 @@ const onReceiveAnswer = () => {
     ws.onerror = () => {
         console.error('ws error');
     };
+
     ws.onopen = () => {
         console.log('open');
+        const registerMessage = {
+            type: 'register',
+            roomId: roomId,
+            clientId: options.clientId,
+            authnMetadata: undefined,
+            key: signalingKey
+        };
+        ws.send(JSON.stringify(registerMessage));
     }
 })();
