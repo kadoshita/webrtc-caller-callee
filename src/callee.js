@@ -41,17 +41,6 @@ const logger = (log, type = 'log') => {
 };
 const createPeerConnection = () => {
     logger(`createPeerConnection`);
-    // const turnServerConfig = {
-    //     urls: turnServerUrlElem.value,
-    //     username: turnServerUserElem.value,
-    //     credential: turnServerPassElem.value
-    // };
-    // const iceServers = [
-    //     { urls: (stunServerUrlElem.value === '') ? 'stun:stun.l.google.com:19302' : stunServerUrlElem.value }
-    // ]
-    // if (turnServerConfig.urls !== '' && turnServerConfig.username !== '' && turnServerConfig.credential !== '') {
-    //     iceServers.push(turnServerConfig);
-    // }
 
     const _pc = new RTCPeerConnection({
         iceServers,
