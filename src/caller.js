@@ -41,19 +41,8 @@ const logger = (log, type = 'log') => {
     const prevValue = logConsole.value;
     logConsole.value = `[${type.toUpperCase()}] ${date.toLocaleTimeString()}.${zero_padding(date.getMilliseconds(), 3)}: ${log}\n` + prevValue;
 };
-const createPeerConnection = localStream => {
+const createPeerConnection = (localStream, iceServers) => {
     logger(`createPeerConnection`);
-    const turnServerConfig = {
-        urls: turnServerUrlElem.value,
-        username: turnServerUserElem.value,
-        credential: turnServerPassElem.value
-    };
-    const iceServers = [
-        { urls: (stunServerUrlElem.value === '') ? 'stun:stun.l.google.com:19302' : stunServerUrlElem.value }
-    ]
-    if (turnServerConfig.urls !== '' && turnServerConfig.username !== '' && turnServerConfig.credential !== '') {
-        iceServers.push(turnServerConfig);
-    }
 
     const _pc = new RTCPeerConnection({
         iceServers,
@@ -96,9 +85,9 @@ const createPeerConnection = localStream => {
 
     return _pc;
 };
-const onCreateOffer = localStream => {
+const onCreateOffer = (localStream, iceServers) => {
     logger('onCreateOffer');
-    pc = createPeerConnection(localStream);
+    pc = createPeerConnection(localStream, iceServers);
 
     pc.createOffer()
         .then(offerSdp => {
@@ -137,7 +126,7 @@ const onReceiveAnswer = () => {
     logger('set stream');
 
     createOfferButton.addEventListener('click', () => {
-        onCreateOffer(localStream);
+        // onCreateOffer(localStream);
     });
     receiveAnswerButton.addEventListener('click', onReceiveAnswer);
 
@@ -179,6 +168,8 @@ const onReceiveAnswer = () => {
                 console.log(recvData);
                 if (recvData.type === 'ping') {
                     ws.send(JSON.stringify({ type: 'pong' }));
+                } else if (recvData.type === 'accept') {
+                    onCreateOffer(localStream, recvData.iceServers);
                 }
             };
         }
