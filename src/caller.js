@@ -65,11 +65,11 @@ const createPeerConnection = (localStream, iceServers) => {
     };
     _pc.onicecandidate = evt => {
         logger(`onicecandidate`);
-        if (!evt.candidate) {
+        if (evt.candidate) {
             offerSdpElem.value = _pc.localDescription.sdp;
             offerSdpElem.focus();
             offerSdpElem.select();
-            ws.send(JSON.stringify(pc.localDescription));
+            ws.send(JSON.stringify({ type: 'candidate', ice: evt.candidate }));
         }
     };
     _pc.oniceconnectionstatechange = evt => {

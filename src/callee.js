@@ -63,7 +63,7 @@ const createPeerConnection = () => {
             answerSdpElem.value = _pc.localDescription.sdp;
             answerSdpElem.focus();
             answerSdpElem.select();
-            ws.send(JSON.stringify(pc.localDescription));
+            ws.send(JSON.stringify({ type: 'candidate', ice: evt.candidate }));
         }
     };
     _pc.oniceconnectionstatechange = evt => {
@@ -99,6 +99,8 @@ const onReceiveOffer = () => {
                     .then(answerSdp => {
                         logger(`createAnswer`);
                         return pc.setLocalDescription(answerSdp);
+                    }).then(() => {
+                        ws.send(JSON.stringify(pc.localDescription));
                     })
                     .catch(err => {
                         logger(`createAnswer->${err.message}`, 'error');
