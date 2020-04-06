@@ -130,9 +130,6 @@ const onReceiveCandidate = sdp => {
     turnServerUserElem.value = localStorage.getItem('turnServerUser');
     turnServerPassElem.value = localStorage.getItem('turnServerPass');
     forceUseForTurnElem.checked = (localStorage.getItem('forceUseForTurn') === 'true');
-    // receiveOfferButton.addEventListener('click', () => {
-    //     onReceiveOffer();
-    // });
 
     const options = {
         video: {

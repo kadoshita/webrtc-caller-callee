@@ -113,7 +113,6 @@ const onCreateOffer = (localStream, iceServers) => {
 };
 const onReceiveAnswer = receiveSdp => {
     logger(`onReceiveAnswer`);
-    // const receiveSdp = answerSdpElem.value;
     pc.setRemoteDescription(
         new RTCSessionDescription({
             type: 'answer',
@@ -155,10 +154,6 @@ const onReceiveCandidate = sdp => {
         localVideoElem.srcObject = null;
         localStream = nuill;
     });
-    // createOfferButton.addEventListener('click', () => {
-    //     // onCreateOffer(localStream);
-    // });
-    // receiveAnswerButton.addEventListener('click', onReceiveAnswer);
 
     getLocalSDPButton.addEventListener('click', () => {
         console.log(pc.localDescription);
