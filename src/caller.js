@@ -9,7 +9,7 @@ const remoteVideoElem = document.getElementById('remote-video');
 
 const logConsole = document.getElementById('log-console');
 
-const connectBuddon = document.getElementById('connect-button');
+const connectButton = document.getElementById('connect-button');
 const disconnectButton = document.getElementById('disconnect-button');
 const offerSdpElem = document.getElementById('offer-sdp');
 const answerSdpElem = document.getElementById('answer-sdp');
@@ -144,7 +144,7 @@ const onReceiveCandidate = sdp => {
     logger('set stream');
 
     let iceServers = null;
-    connectBuddon.addEventListener('click', () => {
+    connectButton.addEventListener('click', () => {
         onCreateOffer(localStream, iceServers);
     });
     disconnectButton.addEventListener('click', () => {
