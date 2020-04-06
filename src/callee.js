@@ -16,6 +16,7 @@ let ws = null;
 let pc = null;
 let remoteStream = null;
 let iceServers = null;
+let isConnected = false;
 
 const zero_padding = (num, digit) => {
     return num.toString().padStart(digit, '0');
@@ -58,7 +59,7 @@ const createPeerConnection = () => {
     };
     _pc.onicecandidate = evt => {
         logger(`onicecandidate`);
-        if (!evt.candidate) {
+        if (evt.candidate) {
             answerSdpElem.value = _pc.localDescription.sdp;
             answerSdpElem.focus();
             answerSdpElem.select();
@@ -120,9 +121,9 @@ const onReceiveCandidate = sdp => {
     turnServerUserElem.value = localStorage.getItem('turnServerUser');
     turnServerPassElem.value = localStorage.getItem('turnServerPass');
     forceUseForTurnElem.checked = (localStorage.getItem('forceUseForTurn') === 'true');
-    receiveOfferButton.addEventListener('click', () => {
-        onReceiveOffer();
-    });
+    // receiveOfferButton.addEventListener('click', () => {
+    //     onReceiveOffer();
+    // });
 
     const options = {
         video: {

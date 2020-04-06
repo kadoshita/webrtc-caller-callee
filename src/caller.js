@@ -20,6 +20,7 @@ const getRemoteSDPButton = document.getElementById('get-remote-sdp');
 
 let pc = null;
 let ws = null;
+let isConnected = false;
 
 const zero_padding = (num, digit) => {
     return num.toString().padStart(digit, '0');
@@ -58,6 +59,9 @@ const createPeerConnection = (localStream, iceServers) => {
     localStorage.setItem('forceUseForTurn', forceUseForTurnElem.checked);
     _pc.onconnectionstatechange = evt => {
         logger(`onconnectionstatechange->${_pc.connectionState}`);
+        if (_pc.connectionState === 'connected') {
+            isConnected = true;
+        }
     };
     _pc.onicecandidate = evt => {
         logger(`onicecandidate`);
@@ -92,18 +96,23 @@ const onCreateOffer = (localStream, iceServers) => {
     logger('onCreateOffer');
     pc = createPeerConnection(localStream, iceServers);
 
-    pc.createOffer()
+    pc.createOffer({
+        offerToReceiveAudio: false,
+        offerToReceiveVideo: true
+    })
         .then(offerSdp => {
             logger(`createOffer`);
             return pc.setLocalDescription(offerSdp);
+        }).then(() => {
+            ws.send(JSON.stringify(pc.localDescription));
         })
         .catch(err => {
             logger(`createOffer->${err.message}`, 'error');
         });
 };
-const onReceiveAnswer = () => {
+const onReceiveAnswer = receiveSdp => {
     logger(`onReceiveAnswer`);
-    const receiveSdp = answerSdpElem.value;
+    // const receiveSdp = answerSdpElem.value;
     pc.setRemoteDescription(
         new RTCSessionDescription({
             type: 'answer',
@@ -133,10 +142,14 @@ const onReceiveCandidate = sdp => {
     localVideoElem.srcObject = localStream;
     logger('set stream');
 
-    createOfferButton.addEventListener('click', () => {
-        // onCreateOffer(localStream);
+    let iceServers = null;
+    connectBuddon.addEventListener('click', () => {
+        onCreateOffer(localStream, iceServers);
     });
-    receiveAnswerButton.addEventListener('click', onReceiveAnswer);
+    // createOfferButton.addEventListener('click', () => {
+    //     // onCreateOffer(localStream);
+    // });
+    // receiveAnswerButton.addEventListener('click', onReceiveAnswer);
 
     getLocalSDPButton.addEventListener('click', () => {
         console.log(pc.localDescription);
@@ -176,10 +189,13 @@ const onReceiveCandidate = sdp => {
                 if (recvData.type === 'ping') {
                     ws.send(JSON.stringify({ type: 'pong' }));
                 } else if (recvData.type === 'accept') {
-                    onCreateOffer(localStream, recvData.iceServers);
+                    console.log('accepted');
+                    iceServers = recvData.iceServers;
                 } else if (recvData.type === 'answer') {
-                    answerSdpElem.value = recvData.sdp;
-                    onReceiveAnswer();
+                    if (!isConnected) {
+                        answerSdpElem.value = recvData.sdp;
+                        onReceiveAnswer(recvData.sdp);
+                    }
                 } else if (recvData.type === 'candidate') {
                     onReceiveCandidate(recvData.ice);
                 }
