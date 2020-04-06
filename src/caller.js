@@ -9,6 +9,7 @@ const remoteVideoElem = document.getElementById('remote-video');
 
 const logConsole = document.getElementById('log-console');
 
+const connectBuddon = document.getElementById('connect-button');
 const offerSdpElem = document.getElementById('offer-sdp');
 const answerSdpElem = document.getElementById('answer-sdp');
 const createOfferButton = document.getElementById('create-offer-button');
