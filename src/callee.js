@@ -56,6 +56,13 @@ const createPeerConnection = () => {
 
     _pc.onconnectionstatechange = evt => {
         logger(`onconnectionstatechange->${_pc.connectionState}`);
+        if (_pc.connectionState === 'closed') {
+            _pc.close();
+            _pc = null;
+            remoteVideoElem.pause();
+            remoteVideoElem.srcObject = null;
+            remoteStream = null;
+        }
     };
     _pc.onicecandidate = evt => {
         logger(`onicecandidate`);
