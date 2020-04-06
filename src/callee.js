@@ -45,7 +45,7 @@ const createPeerConnection = () => {
 
     const _pc = new RTCPeerConnection({
         iceServers,
-        iceTransportPolicy: forceUseForTurnElem.checked ? 'relay' : 'all'
+        iceTransportPolicy: useTurn ? 'relay' : 'all'
     });
 
     localStorage.setItem('stunServerUrl', stunServerUrlElem.value);
